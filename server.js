@@ -14,8 +14,8 @@ var SNSClient = require('aws-snsclient');
 var awsRegion = 'us-west-2';
 
 AWS.config.update({
-  accessKeyId: 'AKIAJOEHZSF2UJHTQFXQ',
-  secretAccessKey: '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',
+  accessKeyId: '',
+  secretAccessKey: '',
   region: awsRegion
 });
 
