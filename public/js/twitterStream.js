@@ -1,4 +1,18 @@
+  //Setup heat map and link to Twitter array we will append data to
+  var cat = "all";
+  var socket;
+  var heatmap;
+  var markersArray = [];
+
+  var liveTweets = new google.maps.MVCArray();
+  heatmap = new google.maps.visualization.HeatmapLayer({
+    data: liveTweets,
+    radius: 25
+  });
+
+
 function initialize() {
+  console.log('initialized');
   //Setup Google Map
   var myLatlng = new google.maps.LatLng(17.7850,-12.4183);
   var light_grey_style = [{"featureType":"landscape","stylers":[{"saturation":-100},{"lightness":65},{"visibility":"on"}]},{"featureType":"poi","stylers":[{"saturation":-100},{"lightness":51},{"visibility":"simplified"}]},{"featureType":"road.highway","stylers":[{"saturation":-100},{"visibility":"simplified"}]},{"featureType":"road.arterial","stylers":[{"saturation":-100},{"lightness":30},{"visibility":"on"}]},{"featureType":"road.local","stylers":[{"saturation":-100},{"lightness":40},{"visibility":"on"}]},{"featureType":"transit","stylers":[{"saturation":-100},{"visibility":"simplified"}]},{"featureType":"administrative.province","stylers":[{"visibility":"off"}]},{"featureType":"water","elementType":"labels","stylers":[{"visibility":"on"},{"lightness":-25},{"saturation":-100}]},{"featureType":"water","elementType":"geometry","stylers":[{"hue":"#ffff00"},{"lightness":-25},{"saturation":-97}]}];
@@ -14,38 +28,78 @@ function initialize() {
     styles: light_grey_style
   };
   var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
-  
-  //Setup heat map and link to Twitter array we will append data to
-  var heatmap;
-  var liveTweets = new google.maps.MVCArray();
-  heatmap = new google.maps.visualization.HeatmapLayer({
-    data: liveTweets,
-    radius: 25
-  });
-  heatmap.setMap(map);
 
+  
+  heatmap.setMap(map); 
+  //alert('1');
+  //debugger;
   if(io !== undefined) {
     // Storage for WebSocket connections
-    var socket = io.connect('/');
+    socket = io.connect();
+
+    socket.on('trend-update', function (data) {
+      var element = document.getElementById(data.city_id);
+      element.setInnerHTML(data.top_trend);
+    });
 
     // This listens on the "twitter-steam" channel and data is 
     // received everytime a new tweet is receieved.
     socket.on('twitter-stream', function (data) {
 
-      //Add tweet to the heat map array.
-      var tweetLocation = new google.maps.LatLng(data.lng,data.lat);
-      liveTweets.push(tweetLocation);
+      
+   if (data.sentiment == 'positive') {
 
-      //Flash a dot onto the map quickly
-      var image = "css/small-dot-icon.png";
+      var circle ={
+          path: google.maps.SymbolPath.CIRCLE,
+          fillColor: 'green',
+          fillOpacity: .4,
+          scale: 4.5,
+          strokeColor: 'white',
+          strokeWeight: 1
+      };
+    } else if (data.sentiment == 'negative') {
+      var circle ={
+          path: google.maps.SymbolPath.CIRCLE,
+          fillColor: 'red',
+          fillOpacity: .4,
+          scale: 4.5,
+          strokeColor: 'white',
+          strokeWeight: 1
+      };      
+    } else {
+      var circle ={
+          path: google.maps.SymbolPath.CIRCLE,
+          fillColor: 'yellow',
+          fillOpacity: .4,
+          scale: 4.5,
+          strokeColor: 'white',
+          strokeWeight: 1
+      };      
+    }
+
+      //Add tweet to the heat map array.
+      var tweetLocation = new google.maps.LatLng(data.longitude,data.latitude);
+      //liveTweets.push(tweetLocation);
+
       var marker = new google.maps.Marker({
         position: tweetLocation,
-        map: map,
-        icon: image
+        icon:circle,
+        map:map
       });
-      setTimeout(function(){
-        marker.setMap(null);
-      },600);
+      markersArray.push(marker);
+
+      
+
+      //Flash a dot onto the map quickly
+      // var image = "css/small-dot-icon.png";
+      // var marker = new google.maps.Marker({
+      //   position: tweetLocation,
+      //   map: map,
+      //   icon: image
+      // });
+      // setTimeout(function(){
+      //   marker.setMap(null);
+      // },600);
 
     });
 
@@ -58,4 +112,39 @@ function initialize() {
       socket.emit("start tweets");
     });
   }
+}
+
+function getTweetInCategory()
+{
+  // get selected category
+  cat = document.getElementById('category').value;
+ 
+  // clear map
+  liveTweets.clear();
+  //heatmap.setMap(null);
+
+  
+  socket.emit("tweets in cat" , cat);
+
+ }
+function getTweetInCustom()
+{
+  // get selected category
+  cat = document.getElementById('trend').value;
+ 
+  // clear map
+  liveTweets.clear();
+  clearOverlays();
+  //heatmap.setMap(null);
+
+  
+  socket.emit("tweets in cat" , cat);
+
+ }
+
+ function clearOverlays() {
+  for (var i = 0; i < markersArray.length; i++ ) {
+    markersArray[i].setMap(null);
+  }
+  markersArray.length = 0;
 }

@@ -32,30 +32,48 @@
 </head>
 
 <body onload="initialize()">
-
-	<div class="navbar navbar-fixed-top">
-		<div class="navbar-inner">
-			<div class="container">        
-				<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-					<span class="icon-bar"></span>
-					<span class="icon-bar"></span>
-					<span class="icon-bar"></span>
-				</a>
-
-				<div class="nav-collapse collapse">
-					<a href="https://github.com/safesoftware/twitter-streaming-nodejs" class="btn">
-						<img src="libs/github-logo.png"> Fork GitHub
-					</a>
-					<a href="https://github.com/safesoftware/twitter-streaming-nodejs/archive/master.zip" class="btn">
-						<i class="icon-download-alt"></i> Download Zip
-					</a>
-				</div>
-			</div>
-		</div>
-	</div>
-
 	<div class="container">
+
+		<div id="Categories">
+		<select align="center" id="category" onChange="getTweetInCategory()">
+		  <option value="all"> All </option>
+		  <option value="iphone">iPhone</option>
+		  <option value="ios">iOS</option>
+		  <option value="android">Android</option>
+		  <option value="samsung">Samsung</option>
+		  <option value="nokia">Nokia</option>
+		  <option value="lg">LG</option>
+		  <option value="huawei">Huawei</option>
+		  <!--
+		  <option value="Drake">Drake</option>
+		  <option value="NickiMinaj">Nicki Minaj</option>
+		  <option value="NickJonas">Nick Jonas</option>
+		  <option value="Ariana">Ariana</option>
+		  <option value="love">Love</option>
+		  <option value="hate">Hate</option>
+		  <option value="agry">Angry</option>
+		  <option value="scared">Scared</option>
+		-->
+		</select>
+		<input id="trend" value="<enter your trend>">
+		<button onClick="getTweetInCustom()">show custom trend</button>
+		<!--label id="">test</label-->
+		</div>
+
 		<div id="map_canvas"></div>
+
+		<div id="toptrends"> 
+			<table id="trendstable" style="width:80%" border=2px>
+				<caption>Geo Trends</caption>
+				<tr><th> Location </th> <th> Top Trend </th> </tr>
+				<tr><td> New York </td> <td id="NewYork"></td> </tr>
+				<tr><td> Los Angeles </td> <td id="Los Angeles"></td> </tr>
+				<tr><td> Houston </td> <td id="Houston"></td> </tr>
+				<tr><td> Chicago </td> <td id="Chicago"></td> </tr>
+				<tr><td> New Orleans </td> <td id="NewOrleans"></td> </tr>
+				<tr><td> Miami </td> <td id="Miami"></td> </tr>
+			</table>
+		</div>
 	</div>
 </body>
 </html>
